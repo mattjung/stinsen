@@ -17,6 +17,29 @@ public struct Presentation: RouteType {
     let type: PresentationType
 }
 
+public extension RouteType where Self == RootSwitch {
+    static var root: RootSwitch { .init() }
+}
+
+public extension RouteType where Self == Presentation {
+
+    static var modal: Presentation {
+        .init(type: .modal)
+    }
+    
+    static var fullScreen: Presentation {
+        if #available(iOS 14, *) {
+            .init(type: .fullScreen)
+        } else {
+            .init(type: .modal)
+        }
+    }
+    
+    static var push: Presentation {
+        .init(type: .push)
+    }
+}
+
 public struct Transition<T: NavigationCoordinatable, U: RouteType, Input, Output: ViewPresentable>: NavigationOutputable {
     let type: U
     let closure: ((T) -> ((Input) -> Output))
@@ -34,7 +57,7 @@ public struct Transition<T: NavigationCoordinatable, U: RouteType, Input, Output
     
     public var wrappedValue: Transition<T, U, Input, Output>
     
-    init(standard: Transition<T, U, Input, Output>) {
+    public init(standard: Transition<T, U, Input, Output>) {
         self.wrappedValue = standard
     }
 }
